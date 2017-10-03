@@ -124,7 +124,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 					}
 					$scope.miners[name].desc     = jsDateDiff($scope.miners[name].time, $scope.miners[name].lasttime);
 					
-					if (item.time - item.lastSeen > 15 * 60 || item.diff < 0) {
+					if ($scope.miners[name].time - $scope.miners[name].lasttime > 300 * 1000 || item.diff < 0) {
 						$scope.miners[name].state = 'off';
 					} else {
 						$scope.miners[name].state = 'on';
@@ -168,7 +168,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 						if (item.lastSeen) {
 							$scope.miners[item.worker].lasttime = new Date(item.lastSeen * 1000);
 						}
-						$scope.miners[item.worker].desc     = jsDateDiff(item.time, item.lastSeen);
+						$scope.miners[item.worker].desc     = jsDateDiff($scope.miners[item.worker].time, $scope.miners[item.worker].lasttime);
 						
 						if (item.time - item.lastSeen > 15 * 60) {
 							$scope.miners[item.worker].state = 'off';
@@ -236,7 +236,7 @@ function round(dight, howMany) {
 function jsDateDiff(time_now, last_time){      
     var d_minutes,d_hours,d_days;      
     var d;      
-    d = time_now - last_time;      
+    d = (time_now - last_time)/1000;      
     d_days = parseInt(d/86400);      
     d_hours = parseInt(d/3600);      
     d_minutes = parseInt(d/60);      
@@ -249,7 +249,7 @@ function jsDateDiff(time_now, last_time){
     }else if(d_minutes<=0 && d>=0) {
     	return d>0 ? d+"秒前" : "刚刚";
     } else{
-        var s = new Date(time_now*1000);      
-        return (s.getMonth()+1)+"月"+s.getDate()+"日";      
-    }      
-}       
+        var s = last_time;      
+        return s ? (s.getMonth()+1)+"月"+s.getDate()+"日" : null;      
+    }
+}
