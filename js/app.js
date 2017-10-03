@@ -28,7 +28,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 			hashrate : null,
 			avghash  : null,
 			rateunit : '',
-			shares   : 0,
+			shares   : null,
 			time     : null,
 			lasttime : null,
 			desc     : null,

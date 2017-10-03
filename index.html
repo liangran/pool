@@ -99,6 +99,7 @@
 						<th style="text-align: center">名称</th>
 						<th style="text-align: center">币种</th>
 						<th style="text-align: right">算力</th>
+						<th style="text-align: right">Shares</th>
 						<th style="text-align: center">更新时间</th>
 						<th style="text-align: center">备注</th>
 					</tr>
@@ -106,6 +107,7 @@
 						<td style="text-align: center">{{worker.name}}</td>
 						<td style="text-align: center">{{worker.coin}}</td>
 						<td style="text-align: right"><span ng-show="worker.hashrate">{{worker.hashrate | number : 2}} {{worker.rateunit}}</span></td>
+						<td style="text-align: right">{{worker.shares | number : 0}}</td>
 						<td style="text-align: center">{{worker.lasttime  | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 						<td style="text-align: center">{{worker.desc}}</td>
 					</tr>
