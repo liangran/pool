@@ -71,14 +71,14 @@ function check() {
 			task.thread.kill();
 		}
 		
-		var type = task.reset_num < 2 ? 'main' : 'backup';
+		var type = task.reset_num < 10 ? 'main' : 'backup';
 		run(type);
 	}
 }
 
 function ticker() {
 	var now = new Date();
-	if ((now - task.update_time)/1000 > 120 && task.state != 'off') {
+	if ((now - task.update_time)/1000 > 60 && task.state != 'off') {
 		logger.warn('No update for %s seconds.', (now - task.update_time)/1000)
 		task.state = 'stop';
 	}
