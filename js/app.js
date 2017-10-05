@@ -5,7 +5,7 @@ myApp.run(['$rootScope', function($rootScope) {
 }]);
 
 myApp.controller('MyController', function($scope, $interval, $http) {
-	var zcl_api = "http://upool.foxcny.com/api/worker_stats?t1JxC6aaWzJ6jESwW4SCqVSWf8YyJvXqZ7Q";
+	var zcl_api = "http://upool.cc/api/worker_stats?t1JxC6aaWzJ6jESwW4SCqVSWf8YyJvXqZ7Q";
 	var zec_api = "https://api-zcash.flypool.org/miner/t1NajHvjBQtndnn1VEzY5r4xgYihZ8e5bE2/workers?miner=t1NajHvjBQtndnn1VEzY5r4xgYihZ8e5bE2";
 	
 	var price_api = "https://api.coinmarketcap.com/v1/ticker/?convert=CNY&limit=400";

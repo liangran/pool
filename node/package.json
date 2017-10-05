@@ -1,0 +1,14 @@
+{
+  "name": "pool",
+  "version": "1.0.0",
+  "description": "A service for JG pool monitor",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "JG",
+  "license": "ISC",
+  "dependencies": {
+    "log4js": "^2.3.4"
+  }
+}
