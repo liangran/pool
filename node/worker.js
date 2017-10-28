@@ -1,4 +1,5 @@
 var child_process = require('child_process');
+var request       = require("request");
 
 var log4js     = require('log4js');
 log4js.configure({
@@ -8,10 +9,11 @@ log4js.configure({
 var logger = log4js.getLogger('console');
 
 var task = {
-	start   : __dirname + '\\zcl.bat',
-	kill    : __dirname + '\\kill.bat',
+	exe     : 'miner.exe',
+	path    : 'C:/Zec/0.3.4b',
+	start   : undefined,
 	thread  : undefined,
-	state   : 'off',
+	api     : 'http://127.0.0.1:42000/getstat',
 	start_time  : null,
 	update_time : null,
 	check_num   : 0
@@ -24,20 +26,21 @@ process.on('exit', function () {
     }
 });
 
-
 var myArgs = process.argv.slice(2);
 if (myArgs[0] == 'zec') {
-	task.start  = __dirname + '\\zec.bat';
+	task.start  = task.path + '/zec.bat';
 } else {
-	task.start  = __dirname + '\\zcl.bat';
+	task.start  = task.path + '/zcl.bat';
 }
 
-function run(command) {
-	logger.warn('Spawn', command);
-	task.thread = child_process.spawn(command);
+function run(command, params, callback) {
+	logger.warn('Spawn', command, params.join(' '));
+	task.thread = child_process.spawn(command, params);
 
+	output = "";
 	task.thread.stdout.on('data', (data) => {
 		logger.info(data.toString());
+		output += data.toString();
 	});
 
 	task.thread.stderr.on('data', (data) => {
@@ -47,11 +50,55 @@ function run(command) {
 	task.thread.on('exit', (code) => {
 		logger.warn(`Child exited with code ${code}`);
 		task.thread = undefined;
-		task.state = 'off';
+		callback(output);
 	});
+}
 
-	var now = new Date();
-	task.state = 'on';
+function isProcessRunning(callback) {
+	run('tasklist.exe', ['/FI', 'IMAGENAME eq ' + task.exe], (output) =>{
+		return callback(output.indexOf('PID') > 0);
+	});
+}
+
+function killProcess(callback) {
+	run('taskkill.exe', ['/F', '/IM', task.exe], (output) =>{
+		return callback();
+	});
+}
+
+function startProcess(callback) {
+	run('cmd.exe', ['/c', 'START ' + task.start], (output) =>{
+		return callback();
+	});
+}
+
+function beginMining(callback) {
+	isProcessRunning((running) => {
+		if (running) {
+			logger.warn('Kill and start mining.');
+			killProcess(() => {
+				startProcess(callback);
+			});
+		} else {
+			logger.warn('Start mining.')
+			startProcess(callback);
+		}
+	});
+}
+
+function getstat(callback) {
+	request(task.api, function(error, response, body) {
+		if (!error) {
+			console.log(response.statusCode, body)
+			//var data = JSON.parse(body));
+			var result = {"method":"getstat", "error":null, "start_time":1509161274, "current_server":"JG999:6666", "available_servers":1, "server_status":2, "result":[{"gpuid":0, "cudaid":0, "busid":"0000:03:00.0", "name":"GeForce GTX 1060 3GB", "gpu_status":2, "solver":0, "temperature":77, "gpu_power_usage":108, "speed_sps":268, "accepted_shares":0, "rejected_shares":0, "start_time":1509161275},{"gpuid":1, "cudaid":1, "busid":"0000:04:00.0", "name":"GeForce GTX 1060 3GB", "gpu_status":2, "solver":0, "temperature":71, "gpu_power_usage":109, "speed_sps":272, "accepted_shares":0, "rejected_shares":0, "start_time":1509161275},{"gpuid":2, "cudaid":2, "busid":"0000:05:00.0", "name":"GeForce GTX 1060 3GB", "gpu_status":2, "solver":0, "temperature":76, "gpu_power_usage":104, "speed_sps":265, "accepted_shares":0, "rejected_shares":0, "start_time":1509161275}]};
+			callback(null, result);
+		} else {
+			logger.warn(body);
+			logger.error(error.code ? error.code : error);
+			callback(error || response.statusCode, null);
+		}
+	});
 }
 
 function check() {
@@ -73,7 +120,6 @@ function ticker() {
 		logger.warn('No update for %s seconds.', (now - task.update_time)/1000)
 		task.state = 'stop';
 	}
-	check();
 	
 	logger.warn('Run for %s seconds', (now - task.update_time)/1000);
 	logger.warn(get_time_difference(now, task.start_time));
@@ -83,9 +129,18 @@ function ticker() {
 }
 
 //ticker();
-console.log(__dirname);
-//run(__dirname + '\\zcl.bat');
-run(__dirname + '\\killzcl.bat');
+beginMining(()=>{
+	console.log('DONE');
+});
+//run(__dirname + '\\killzcl.bat');
+
+//getstat((err, data) => {
+//	if (err) {
+//		logger.error('fail');
+//	} else {
+//		logger.warn(data);
+//	}
+//});
 
 function get_time_difference(laterDate, earlierDate) 
 {
