@@ -1,5 +1,6 @@
 var child_process = require('child_process');
 var fs = require("fs");  
+var MonitorUtil = require('./MonitorUtil.js').MonitorUtil;
 var State = require('./State.js').State;
 
 var log4js     = require('log4js');
@@ -7,7 +8,12 @@ log4js.configure({
   appenders: { console: { type: 'console' } },
   categories: { default: { appenders: [ 'console' ], level: 'debug' } },
 });
+
 var logger = log4js.getLogger('console');
+console.log = logger.info.bind(logger);
+console.warn = logger.warn.bind(logger);
+
+var mutil = new MonitorUtil('http://127.0.0.1:90');
 
 process.on('exit', function () {
     if (task.thread) {
@@ -84,10 +90,6 @@ function beginMining(callback) {
 	});
 }
 
-function getstat(callback) {
-	state.refresh(callback);
-}
-
 function check(callback) {
 	state.refresh((err) => {
 		if (err) {
@@ -109,7 +111,8 @@ function ticker() {
 				setTimeout(function(){ ticker(); }, 10 * 1000);	
 			});
 		} else {
-			setTimeout(function(){ ticker(); }, 10 * 1000);	
+			state.report();
+			setTimeout(function(){ ticker(); }, 30 * 1000);	
 		}
 	});
 }

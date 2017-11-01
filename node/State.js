@@ -44,8 +44,6 @@ State.prototype.refresh = function(callback) {
 					self.accepted_shares += gpu.accepted_shares;
 					self.rejected_shares += gpu.rejected_shares;
 				});
-			} else {
-				console.warn('no change');
 			}
 			
 			var now = new Date();
@@ -61,10 +59,17 @@ State.prototype.refresh = function(callback) {
 	});
 }
 
+State.prototype.report = function() {
+	var str = this.gpu_num + ' GPUs, ' + this.speed + ' Sol/s, ' + this.power
+		+ 'w, ' + this.accepted_shares + '/' + this.rejected_shares
+		+ ', ' + this.since_update;
+	console.log(str);
+}
+
 function jsDateDiff(time_now, last_time){      
     var d_minutes,d_hours,d_days;      
     var d;      
-    d = (time_now - last_time)/1000;      
+    d = parseInt((time_now - last_time)/1000);      
     d_days = parseInt(d/86400);      
     d_hours = parseInt(d/3600);      
     d_minutes = parseInt(d/60);      
