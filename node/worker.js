@@ -19,10 +19,7 @@ process.on('exit', function () {
 var task = {
 	exe     : 'miner.exe',
 	start   : undefined,
-	thread  : undefined,
-	start_time  : null,
-	update_time : null,
-	check_num   : 0
+	thread  : undefined
 };
 
 var myArgs = process.argv.slice(2);
@@ -91,51 +88,33 @@ function getstat(callback) {
 	state.refresh(callback);
 }
 
-function check() {
-	if (task.state == 'off' || task.state == 'stop') {
-		logger.warn('State is', task.state, 'START MINING!');
-		if (task.thread) {
-			logger.warn('Kill the existing one.');
-			task.thread.kill();
+function check(callback) {
+	state.refresh((err) => {
+		if (err) {
+			return callback(err);
 		}
 		
-		var type = task.reset_num < 10 ? 'main' : 'backup';
-		run(type);
-	}
+		if (new Date() - state.update_time > 120 * 1000) {
+			logger.warn('No change for 120s');
+			return callback('timeout');
+		}
+		return callback(null);
+	});
 }
 
 function ticker() {
-	var now = new Date();
-	if ((now - task.update_time)/1000 > 60 && task.state != 'off') {
-		logger.warn('No update for %s seconds.', (now - task.update_time)/1000)
-		task.state = 'stop';
-	}
-	
-	logger.warn('Run for %s seconds', (now - task.update_time)/1000);
-	logger.warn(get_time_difference(now, task.start_time));
-	logger.warn('State:', task.state, 'Run num:', task.reset_num);
-	
-	setTimeout(function(){ ticker(); }, 10 * 1000);	
+	check((err) => {
+		if (err) {
+			beginMining(()=>{
+				setTimeout(function(){ ticker(); }, 10 * 1000);	
+			});
+		} else {
+			setTimeout(function(){ ticker(); }, 10 * 1000);	
+		}
+	});
 }
 
-//ticker();
-
-//beginMining(()=>{
-//	console.log('DONE');
-//});
-
-
-//run(__dirname + '\\killzcl.bat');
-
-getstat((err, data) => {
-	if (err) {
-		logger.error('fail');
-	} else {
-		logger.warn(data);
-		logger.warn(JSON.stringify(state));
-	}
-});
-
+ticker();
 
 function getWorkerName() {
 	var batfile = fs.readFileSync(task.start,"utf-8").split(' ')[1];
