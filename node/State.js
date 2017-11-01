@@ -54,8 +54,8 @@ State.prototype.refresh = function(callback) {
 			
 			callback(null, data);
 		} else {
-			logger.warn(body);
-			logger.error(error.code ? error.code : error);
+			console.warn(body);
+			console.error(error.code ? error.code : error);
 			callback(error || response.statusCode, null);
 		}
 	});
