@@ -47,7 +47,7 @@ State.prototype.refresh = function(callback) {
 			}
 			
 			var now = new Date();
-			self.since_start = jsDateDiff(now, self.start_time);
+			self.since_start = dateStr(new Date(now - self.start_time));
 			self.since_update = jsDateDiff(now, self.update_time);
 			
 			callback(null, data);
@@ -62,7 +62,7 @@ State.prototype.refresh = function(callback) {
 State.prototype.report = function() {
 	var str = this.gpu_num + ' GPUs, ' + this.speed + ' Sol/s, ' + this.power
 		+ 'w, ' + this.accepted_shares + '/' + this.rejected_shares
-		+ ', ' + this.since_update;
+		+ ', ' + this.since_start + ', ' + this.since_update + '更新';
 	console.log(str);
 }
 
@@ -85,6 +85,14 @@ function jsDateDiff(time_now, last_time){
         var s = last_time;      
         return s ? (s.getMonth()+1)+"月"+s.getDate()+"日" : null;      
     }
+}
+
+function dateStr(dt){
+	if (dt.getDate()) {
+		return (dt.getDate()+'d '+dt.getHours()+':'+dt.getMinutes()+':'+dt.getSeconds()).replace(/([\-\: ])(\d{1})(?!\d)/g,'$10$2');
+	} else {
+		return (dt.getHours()+':'+dt.getMinutes()+':'+dt.getSeconds()).replace(/([\-\: ])(\d{1})(?!\d)/g,'$10$2');
+	}
 }
 
 function get_time_difference(laterDate, earlierDate) {
