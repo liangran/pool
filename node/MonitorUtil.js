@@ -29,7 +29,7 @@ MonitorUtil.prototype.post = function(name, value) {
 		} else {
 			try{
 				var data = JSON.parse(body);
-				console.log(data);
+				//console.log(data);
 			} catch (e) {
 				console.error(e);
 			}

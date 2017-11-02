@@ -12,8 +12,9 @@ log4js.configure({
 var logger = log4js.getLogger('console');
 console.log = logger.info.bind(logger);
 console.warn = logger.warn.bind(logger);
+console.error = logger.error.bind(logger);
 
-var mutil = new MonitorUtil('http://127.0.0.1:90');
+var mutil = new MonitorUtil();
 
 process.on('exit', function () {
     if (task.thread) {
@@ -112,6 +113,7 @@ function ticker() {
 			});
 		} else {
 			state.report();
+			mutil.post(state.name, state);
 			setTimeout(function(){ ticker(); }, 30 * 1000);	
 		}
 	});
