@@ -109,7 +109,7 @@ function get_time_difference(laterDate, earlierDate) {
     // ------------------------------------------------------------------- //
     // Format Hours
     var hourtext = '00';
-    if (oDiff.days > 0){ hourtext = String(oDiff.days);}
+    if (oDiff.hours > 0){ hourtext = String(oDiff.hours);}
     if (hourtext.length == 1){hourtext = '0' + hourtext};
 
     // Format Minutes
