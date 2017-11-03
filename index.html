@@ -35,6 +35,7 @@
 							<a href="javascript:" class='btn btn-success btn-sm' ng-click="refreshZCL()" ng-disabled="pools.ZCL.refreshing">ZCL</a>
 							<a href="javascript:" class='btn btn-success btn-sm' ng-click="refreshZEC()" ng-disabled="pools.ZEC.refreshing">ZEC</a>
 							<a href="javascript:" class='btn btn-success btn-sm' ng-click="refreshPrice()" ng-disabled="price.refreshing">价格</a>
+							<a href="javascript:" class='btn btn-success btn-sm' ng-click="refreshGpu()" ng-disabled="gpu_refreshing">矿机</a>
 						</td>
 						<td style="text-align: center">
 							<a href="javascript:" class='btn btn-success btn-sm' ng-click="auto()">
@@ -89,6 +90,16 @@
 						<td style="text-align: center; vertical-align: middle;"></td>
 						<td style="text-align: center; vertical-align: middle;"></td>
 					</tr>
+					<tr>
+						<td style="text-align: center; vertical-align: middle;">显卡数</td>
+						<td style="text-align: center; vertical-align: middle;"></td>
+						<td style="text-align: center; vertical-align: middle;"></td>
+						<td style="text-align: center; vertical-align: middle;"></td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.gpu_num | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZCL.gpu_num | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;"></td>
+						<td style="text-align: center; vertical-align: middle;"></td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
@@ -98,18 +109,22 @@
 					<tr class="active">
 						<th style="text-align: center">名称</th>
 						<th style="text-align: center">币种</th>
+						<th style="text-align: right">矿池算力</th>
+						<th style="text-align: right">显卡数</th>
 						<th style="text-align: right">算力</th>
-						<th style="text-align: right">Shares</th>
-						<th style="text-align: center">更新时间</th>
+						<th style="text-align: right">矿池/矿机A/R</th>
+						<th style="text-align: center">运行时间</th>
 						<th style="text-align: center">备注</th>
 					</tr>
-					<tr ng-class="{danger:worker.state=='off', success:worker.state=='on', warning:worker.state=='pending' }" ng-repeat="(name, worker) in miners">
+					<tr ng-class="{danger:worker.state=='off', success:worker.state=='on', warning:(worker.state=='pending' || worker.gpu_timeout) }" ng-repeat="(name, worker) in miners">
 						<td style="text-align: center">{{worker.name}}</td>
 						<td style="text-align: center">{{worker.coin}}</td>
 						<td style="text-align: right"><span ng-show="worker.hashrate">{{worker.hashrate | number : 2}} {{worker.rateunit}}</span></td>
-						<td style="text-align: right">{{worker.shares | number : 0}}</td>
-						<td style="text-align: center">{{worker.lasttime  | date:'yyyy-MM-dd HH:mm:ss'}}</td>
-						<td style="text-align: center">{{worker.desc}}</td>
+						<td style="text-align: right">{{worker.gpu_num | number : 0}}</td>
+						<td style="text-align: right"><span ng-show="worker.gpu_speed">{{worker.gpu_speed | number : 0}} Sol/s</span></td>
+						<td style="text-align: right">{{worker.shares | number : 0}}<span ng-show="worker.gpu_accept">/{{worker.gpu_accept | number : 0}}/{{worker.gpu_reject | number : 0}}</span></td>
+						<td style="text-align: center">{{worker.gpu_since  | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+						<td style="text-align: center">{{worker.gpu_update_desc}}</td>
 					</tr>
 				</tbody>
 			</table>

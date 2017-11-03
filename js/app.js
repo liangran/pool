@@ -7,6 +7,7 @@ myApp.run(['$rootScope', function($rootScope) {
 myApp.controller('MyController', function($scope, $interval, $http) {
 	var zcl_api = "http://upool.cc/api/worker_stats?t1JxC6aaWzJ6jESwW4SCqVSWf8YyJvXqZ7Q";
 	var zec_api = "https://api-zcash.flypool.org/miner/t1NajHvjBQtndnn1VEzY5r4xgYihZ8e5bE2/workers?miner=t1NajHvjBQtndnn1VEzY5r4xgYihZ8e5bE2";
+	var gpu_api = "http://120.26.101.219:90";
 	
 	var price_api = "https://api.coinmarketcap.com/v1/ticker/?convert=CNY&limit=400";
 	
@@ -32,18 +33,27 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 			time     : null,
 			lasttime : null,
 			desc     : null,
-			state    : 'pending'
+			state    : 'pending',
+			gpu_num    : null,
+			gpu_speed  : null,
+			gpu_accept : null,
+			gpu_reject : null,
+			gpu_start  : null,
+			gpu_since  : null,
+			gpu_update_desc : null,
+			gpu_timeout : false
 		}
 	});
 	
 	$scope.pools = {
-		ZCL : {alive: 0, hashrate: 0, refreshing: false},
-		ZEC : {alive: 0, hashrate: 0, refreshing: false},
-		ETH : {alive: 0, hashrate: 0, refreshing: false}
+		ZCL : {alive: 0, hashrate: 0, gpu_num:0, refreshing: false},
+		ZEC : {alive: 0, hashrate: 0, gpu_num:0, refreshing: false},
+		ETH : {alive: 0, hashrate: 0, gpu_num:0, refreshing: false}
 	}
 	$scope.after = function(coin) {
 		$scope.pools[coin].alive = 0;
 		$scope.pools[coin].hashrate = 0;
+		$scope.pools[coin].gpu_num = 0;
 		for(var name in $scope.miners) {
 			var worker = $scope.miners[name];
 			if (coin == 'ZCL' && worker.coin == coin && worker.state == 'on') {
@@ -58,6 +68,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 				$scope.pools[coin].alive++;
 				$scope.pools[coin].hashrate = $scope.pools[coin].hashrate + parseFloat(worker.hashrate);
 			}
+			$scope.pools[coin].gpu_num += (worker.gpu_num ? worker.gpu_num : 0);
 		}
 	}
 	$scope.before = function(coin) {
@@ -186,6 +197,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 		$scope.refreshZCL();
 		$scope.refreshZEC();
 		$scope.refreshPrice();
+		$scope.refreshGpu();
 	}
 	
 	$scope.price = {refreshing: false};
@@ -201,6 +213,30 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 					}
 				});
 				console.log($scope.price);
+			}
+		});
+	}
+	
+	$scope.gpu_refreshing = false;
+	$scope.refreshGpu = function() {
+		$scope.gpu_refreshing = true;
+		getResource(gpu_api, function(err, data) {
+			$scope.gpu_refreshing = false;
+			if (data) {
+				var server_time = new Date(data.server_time);
+				for (var name in data) {
+					if ($scope.miners[name]) {
+						$scope.miners[name].gpu_num = data[name].value.gpu_num;
+						$scope.miners[name].gpu_speed  = data[name].value.speed;
+						$scope.miners[name].gpu_accept = data[name].value.accepted_shares;
+						$scope.miners[name].gpu_reject = data[name].value.rejected_shares;
+						$scope.miners[name].gpu_start  = data[name].value.start_time;
+						$scope.miners[name].gpu_since  = data[name].value.since_start;
+						var update_time = new Date(data[name].last_update);
+						$scope.miners[name].gpu_update_desc =jsDateDiff(server_time, update_time);
+						$scope.miners[name].gpu_timeout = server_time - update_time > 120000; 
+					}
+				}
 			}
 		});
 	}
@@ -236,7 +272,7 @@ function round(dight, howMany) {
 function jsDateDiff(time_now, last_time){      
     var d_minutes,d_hours,d_days;      
     var d;      
-    d = (time_now - last_time)/1000;      
+    d = parseInt((time_now - last_time)/1000);      
     d_days = parseInt(d/86400);      
     d_hours = parseInt(d/3600);      
     d_minutes = parseInt(d/60);      
