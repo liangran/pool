@@ -101,6 +101,11 @@ function check(callback) {
 			logger.warn('No change for 120s');
 			return callback('timeout');
 		}
+		
+		if (state.rejected_shares > 10) {
+			logger.warn('Too much rejected');
+			return callback('reject too much');
+		}
 		return callback(null);
 	});
 }

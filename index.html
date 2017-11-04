@@ -151,7 +151,11 @@
 						<td style="text-align: right"><span ng-show="worker.hashrate">{{worker.hashrate | number : 2}} {{worker.rateunit}}</span></td>
 						<td style="text-align: right">{{worker.gpu_desc}}</td>
 						<td style="text-align: right"><span ng-show="worker.gpu_speed">{{worker.gpu_speed | number : 0}} Sol/s</span></td>
-						<td style="text-align: right">{{worker.shares | number : 0}}<span ng-show="worker.gpu_accept">/{{worker.gpu_accept | number : 0}}/{{worker.gpu_reject | number : 0}}</span></td>
+						<td style="text-align: right">
+							<span ng-show="worker.shares">{{worker.shares | number : 0}}</span>
+							<span ng-show="worker.shares && worker.gpu_accept">/</span>
+							<span ng-show="worker.gpu_accept">{{worker.gpu_accept | number : 0}}/{{worker.gpu_reject | number : 0}}</span>
+						</td>
 						<td style="text-align: right"><span ng-show="worker.gpu_thigh">{{worker.gpu_thigh | number : 0}}/{{worker.gpu_tlow | number : 0}}</span></td>
 						<td style="text-align: center">{{worker.gpu_since  | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 						<td style="text-align: center">{{worker.gpu_update_desc}}</td>

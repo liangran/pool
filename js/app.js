@@ -16,10 +16,11 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 		var str = '0' + i;
 		workers.push('jg1' + str.substring(str.length - 2));
 	}
-	for (var i=1; i<=30; i++) {
+	for (var i=1; i<=28; i++) {
 		var str = '0' + i;
 		workers.push('jg2' + str.substring(str.length - 2));
 	}
+	workers.push('jg999zec');
 	
 	$scope.miners = {};
 	workers.forEach(function(name){
@@ -77,21 +78,14 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 				}
 			}
 			if (coin == 'ZEC' && worker.coin == coin && worker.state == 'on') {
-				$scope.pools[coin].alive++;
-				$scope.pools[coin].gpu_speed += worker.gpu_speed;
-				$scope.pools[coin].gpu_num += (worker.gpu_num ? worker.gpu_num : 0);
-				$scope.pools[coin].hashrate = $scope.pools[coin].hashrate + parseFloat(worker.hashrate);
-			}
-		}
-	}
-	$scope.before = function(coin) {
-		var now = new Date();
-		for(var name in $scope.miners) {
-			var worker = $scope.miners[name];
-			if (worker.coin == coin && worker.state != 'pending') {
-				worker.state = 'off';
-				worker.time  = now;
-				worker.desc  = jsDateDiff(worker.time, worker.lastSeen);
+				if (name !== 'jg999zec') { 
+					$scope.pools[coin].alive++;
+				}
+				$scope.pools[coin].gpu_num   += (worker.gpu_num ? worker.gpu_num : 0);
+				$scope.pools[coin].gpu_1063  += (worker.gpu_1063 ? worker.gpu_1063 : 0);
+				$scope.pools[coin].gpu_p106  += (worker.gpu_p106 ? worker.gpu_p106 : 0);
+				$scope.pools[coin].gpu_speed += (worker.gpu_speed ? worker.gpu_speed : 0);
+				$scope.pools[coin].hashrate += worker.hashrate ? parseFloat(worker.hashrate) : 0;
 			}
 		}
 	}
@@ -126,32 +120,33 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 			if (err) {
 				console.error(err);
 			} else {
-				$scope.before('ZCL');
 				for (var key in data.workers) {
 					var item = data.workers[key];
 					var name = key.split('.')[1];
 					if (!$scope.miners[name]) {
 						item.worker = 'ZCL_' + name;
-						$scope.miners[name] = {name : name};
+						$scope.miners[name] = {name : name, coin : 'ZCL'};
 					}
 					
-					$scope.miners[name].coin = 'ZCL';
-					$scope.miners[name].hashrate = item.hashrateString.split(' ')[0];
-					$scope.miners[name].rateunit = item.hashrateString.split(' ')[1];
-					$scope.miners[name].shares   = item.shares;
-					$scope.miners[name].time     = refresh_time;
-					
-					var hist = data.history[key];
-					$scope.miners[name].lasttime = new Date(hist[hist.length-1].time * 1000);
-					if ($scope.miners[name].lasttime > $scope.miners[name].time) {
-						$scope.miners[name].time = $scope.miners[name].lasttime;
-					}
-					$scope.miners[name].desc     = jsDateDiff($scope.miners[name].time, $scope.miners[name].lasttime);
-					
-					if ($scope.miners[name].time - $scope.miners[name].lasttime > 300 * 1000) { //  || item.diff < 0
-						$scope.miners[name].state = 'off';
-					} else {
-						$scope.miners[name].state = 'on';
+					//$scope.miners[name].coin = 'ZCL';
+					if ($scope.miners[name].coin == 'ZCL') {
+						$scope.miners[name].hashrate = item.hashrateString.split(' ')[0];
+						$scope.miners[name].rateunit = item.hashrateString.split(' ')[1];
+						$scope.miners[name].shares   = item.shares;
+						$scope.miners[name].time     = refresh_time;
+						
+//						var hist = data.history[key];
+//						$scope.miners[name].lasttime = new Date(hist[hist.length-1].time * 1000);
+//						if ($scope.miners[name].lasttime > $scope.miners[name].time) {
+//							$scope.miners[name].time = $scope.miners[name].lasttime;
+//						}
+//						$scope.miners[name].desc     = jsDateDiff($scope.miners[name].time, $scope.miners[name].lasttime);
+//						
+//						if ($scope.miners[name].time - $scope.miners[name].lasttime > 300 * 1000) { //  || item.diff < 0
+//							$scope.miners[name].state = 'off';
+//						} else {
+//							$scope.miners[name].state = 'on';
+//						}
 					}
 				}
 				$scope.after('ZCL');
@@ -167,39 +162,31 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 			if (err) {
 				console.error(err);
 			} else {
-				$scope.before('ZEC');
+				$scope.miners['jg999zec'].state = 'off';
 				data.data.forEach(function(item) {
-					var overwrite = true;
-					var now = new Date();
-					if ($scope.miners[item.worker] 
-							&& $scope.miners[item.worker].coin != 'ZEC'
-							&& $scope.miners[item.worker].state == 'on') {
-						overwrite = false;
-					}
-					
-					if (overwrite) {
+					if (!item.lastSeen || item.time - item.lastSeen < 15 * 60) {
+						console.log(item);
 						if (!$scope.miners[item.worker]) {
 							item.worker = 'ZEC_' + item.worker;
-							$scope.miners[item.worker] = {name : item.worker};
+							$scope.miners[item.worker] = {name : item.worker, coin : 'ZEC'};
 						}
 						
-						$scope.miners[item.worker].coin = 'ZEC';
-						$scope.miners[item.worker].rateunit = 'kH/s';
-						$scope.miners[item.worker].hashrate = item.currentHashrate / 1024;
-						$scope.miners[item.worker].avghash  = item.averageHashrate / 1024;
-						$scope.miners[item.worker].shares   = item.validShares;
-						$scope.miners[item.worker].time     = new Date(item.time * 1000);
-						if (item.lastSeen) {
-							$scope.miners[item.worker].lasttime = new Date(item.lastSeen * 1000);
+						if ($scope.miners[item.worker].state != 'on') {
+							$scope.miners[item.worker].coin = 'ZEC';
 						}
-						$scope.miners[item.worker].desc     = jsDateDiff($scope.miners[item.worker].time, $scope.miners[item.worker].lasttime);
-						
-						if (item.time - item.lastSeen > 15 * 60) {
-							$scope.miners[item.worker].state = 'off';
-						} else {
+						if (item.worker == 'jg999zec') {
 							$scope.miners[item.worker].state = 'on';
 						}
+						
+						if ($scope.miners[item.worker].coin == 'ZEC') {
+							$scope.miners[item.worker].rateunit = 'kH/s';
+							$scope.miners[item.worker].hashrate = item.currentHashrate / 1024;
+							$scope.miners[item.worker].avghash  = item.averageHashrate / 1024;
+							$scope.miners[item.worker].shares   = item.validShares;
+						}
+						
 					}
+					
 				});
 				$scope.after('ZEC');
 			}
@@ -239,6 +226,13 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 				var server_time = new Date(data.server_time);
 				for (var name in data) {
 					if ($scope.miners[name]) {
+						if (data[name].value.server == 'JG999:3333') {
+							$scope.miners[name].coin = 'ZEC';
+						} else if (data[name].value.server == 'JG999:6666'){
+							$scope.miners[name].coin = 'ZCL';
+						} else {
+							$scope.miners[name].coin = 'Unknown';
+						}
 						$scope.miners[name].gpu_num = data[name].value.gpu_num;
 						$scope.miners[name].gpu_1063  = 0;
 						$scope.miners[name].gpu_p106  = 0;
@@ -260,13 +254,13 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 								$scope.miners[name].gpu_tlow = gpu.temperature;
 							}
 						});
-						$scope.miners[name].gpu_desc = ',';
+						$scope.miners[name].gpu_desc = '';
 						if ($scope.miners[name].gpu_num !== $scope.miners[name].gpu_1063 + $scope.miners[name].gpu_p106) {
-							$scope.miners[name].gpu_desc += $scope.miners[name].gpu_num + 'GPUs';
+							$scope.miners[name].gpu_desc += ', ' + $scope.miners[name].gpu_num + 'GPUs';
 						}
-						$scope.miners[name].gpu_desc += $scope.miners[name].gpu_1063 ? $scope.miners[name].gpu_1063 + ' * 1063' : '';
-						$scope.miners[name].gpu_desc += $scope.miners[name].gpu_p106 ? $scope.miners[name].gpu_p106 + ' * P106' : '';
-						$scope.miners[name].gpu_desc = $scope.miners[name].gpu_desc.substring(1);
+						$scope.miners[name].gpu_desc += $scope.miners[name].gpu_1063 ? ', ' + $scope.miners[name].gpu_1063 + ' * 1063' : '';
+						$scope.miners[name].gpu_desc += $scope.miners[name].gpu_p106 ? ', ' + $scope.miners[name].gpu_p106 + ' * P106' : '';
+						$scope.miners[name].gpu_desc = $scope.miners[name].gpu_desc.substring(2);
 						
 						$scope.miners[name].gpu_speed  = data[name].value.speed;
 						$scope.miners[name].gpu_accept = data[name].value.accepted_shares;
@@ -275,7 +269,9 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 						$scope.miners[name].gpu_since  = data[name].value.since_start;
 						var update_time = new Date(data[name].last_update);
 						$scope.miners[name].gpu_update_desc =jsDateDiff(server_time, update_time);
-						$scope.miners[name].gpu_timeout = server_time - update_time > 120000; 
+						$scope.miners[name].gpu_timeout = server_time - update_time > 120000;
+						
+						$scope.miners[name].gpu_timeout ? $scope.miners[name].state = 'off' : $scope.miners[name].state = 'on';
 					}
 				}
 			}
