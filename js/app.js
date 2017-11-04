@@ -36,6 +36,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 			desc     : null,
 			state    : 'pending',
 			gpu_num    : 0,
+			gpu_fail   : 0,
 			gpu_1063   : 0,
 			gpu_p106   : 0,
 			gpu_desc   : '',
@@ -238,6 +239,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 						$scope.miners[name].gpu_p106  = 0;
 						$scope.miners[name].gpu_thigh = 0;
 						$scope.miners[name].gpu_tlow  = 0;
+						$scope.miners[name].gpu_fail  = 0;
 						data[name].value.gpus.forEach(function(gpu) {
 							if (gpu.name == 'GeForce GTX 1060 3GB') { 
 								$scope.miners[name].gpu_1063++; 
@@ -245,6 +247,9 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 								$scope.miners[name].gpu_p106++;
 							} else {
 								console.error(gpu.name);
+							}
+							if (gpu.speed_sps < 200) {
+								$scope.miners[name].gpu_fail++;
 							}
 							
 							if (gpu.temperature > $scope.miners[name].gpu_thigh) {
