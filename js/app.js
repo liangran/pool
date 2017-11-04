@@ -34,8 +34,13 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 			lasttime : null,
 			desc     : null,
 			state    : 'pending',
-			gpu_num    : null,
-			gpu_speed  : null,
+			gpu_num    : 0,
+			gpu_1063   : 0,
+			gpu_p106   : 0,
+			gpu_desc   : '',
+			gpu_thigh  : 0,
+			gpu_tlow   : 0,
+			gpu_speed  : 0,
 			gpu_accept : null,
 			gpu_reject : null,
 			gpu_start  : null,
@@ -46,18 +51,25 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 	});
 	
 	$scope.pools = {
-		ZCL : {alive: 0, hashrate: 0, gpu_num:0, refreshing: false},
-		ZEC : {alive: 0, hashrate: 0, gpu_num:0, refreshing: false},
-		ETH : {alive: 0, hashrate: 0, gpu_num:0, refreshing: false}
+		ZCL : {alive: 0, hashrate: 0, gpu_speed:0, gpu_num:0, gpu_1063:0, gpu_p106:0, refreshing: false},
+		ZEC : {alive: 0, hashrate: 0, gpu_speed:0, gpu_num:0, gpu_1063:0, gpu_p106:0, refreshing: false},
+		ETH : {alive: 0, hashrate: 0, gpu_speed:0, gpu_num:0, gpu_1063:0, gpu_p106:0, refreshing: false}
 	}
 	$scope.after = function(coin) {
 		$scope.pools[coin].alive = 0;
 		$scope.pools[coin].hashrate = 0;
+		$scope.pools[coin].gpu_speed = 0;
 		$scope.pools[coin].gpu_num = 0;
+		$scope.pools[coin].gpu_1063 = 0;
+		$scope.pools[coin].gpu_p106 = 0;
 		for(var name in $scope.miners) {
 			var worker = $scope.miners[name];
 			if (coin == 'ZCL' && worker.coin == coin && worker.state == 'on') {
 				$scope.pools[coin].alive++;
+				$scope.pools[coin].gpu_num   += (worker.gpu_num ? worker.gpu_num : 0);
+				$scope.pools[coin].gpu_1063  += (worker.gpu_1063 ? worker.gpu_1063 : 0);
+				$scope.pools[coin].gpu_p106  += (worker.gpu_p106 ? worker.gpu_p106 : 0);
+				$scope.pools[coin].gpu_speed += (worker.gpu_speed ? worker.gpu_speed : 0);
 				if (worker.rateunit == 'KSol/s') {
 					$scope.pools[coin].hashrate = $scope.pools[coin].hashrate + parseFloat(worker.hashrate);
 				} else {
@@ -66,9 +78,10 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 			}
 			if (coin == 'ZEC' && worker.coin == coin && worker.state == 'on') {
 				$scope.pools[coin].alive++;
+				$scope.pools[coin].gpu_speed += worker.gpu_speed;
+				$scope.pools[coin].gpu_num += (worker.gpu_num ? worker.gpu_num : 0);
 				$scope.pools[coin].hashrate = $scope.pools[coin].hashrate + parseFloat(worker.hashrate);
 			}
-			$scope.pools[coin].gpu_num += (worker.gpu_num ? worker.gpu_num : 0);
 		}
 	}
 	$scope.before = function(coin) {
@@ -135,7 +148,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 					}
 					$scope.miners[name].desc     = jsDateDiff($scope.miners[name].time, $scope.miners[name].lasttime);
 					
-					if ($scope.miners[name].time - $scope.miners[name].lasttime > 300 * 1000 || item.diff < 0) {
+					if ($scope.miners[name].time - $scope.miners[name].lasttime > 300 * 1000) { //  || item.diff < 0
 						$scope.miners[name].state = 'off';
 					} else {
 						$scope.miners[name].state = 'on';
@@ -227,6 +240,34 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 				for (var name in data) {
 					if ($scope.miners[name]) {
 						$scope.miners[name].gpu_num = data[name].value.gpu_num;
+						$scope.miners[name].gpu_1063  = 0;
+						$scope.miners[name].gpu_p106  = 0;
+						$scope.miners[name].gpu_thigh = 0;
+						$scope.miners[name].gpu_tlow  = 0;
+						data[name].value.gpus.forEach(function(gpu) {
+							if (gpu.name == 'GeForce GTX 1060 3GB') { 
+								$scope.miners[name].gpu_1063++; 
+							} else if (gpu.name == 'P106-100') {
+								$scope.miners[name].gpu_p106++;
+							} else {
+								console.error(gpu.name);
+							}
+							
+							if (gpu.temperature > $scope.miners[name].gpu_thigh) {
+								$scope.miners[name].gpu_thigh = gpu.temperature;
+							}
+							if ($scope.miners[name].gpu_tlow == 0 || gpu.temperature < $scope.miners[name].gpu_tlow) {
+								$scope.miners[name].gpu_tlow = gpu.temperature;
+							}
+						});
+						$scope.miners[name].gpu_desc = ',';
+						if ($scope.miners[name].gpu_num !== $scope.miners[name].gpu_1063 + $scope.miners[name].gpu_p106) {
+							$scope.miners[name].gpu_desc += $scope.miners[name].gpu_num + 'GPUs';
+						}
+						$scope.miners[name].gpu_desc += $scope.miners[name].gpu_1063 ? $scope.miners[name].gpu_1063 + ' * 1063' : '';
+						$scope.miners[name].gpu_desc += $scope.miners[name].gpu_p106 ? $scope.miners[name].gpu_p106 + ' * P106' : '';
+						$scope.miners[name].gpu_desc = $scope.miners[name].gpu_desc.substring(1);
+						
 						$scope.miners[name].gpu_speed  = data[name].value.speed;
 						$scope.miners[name].gpu_accept = data[name].value.accepted_shares;
 						$scope.miners[name].gpu_reject = data[name].value.rejected_shares;

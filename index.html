@@ -71,26 +71,6 @@
 						<td style="text-align: center; vertical-align: middle;">{{price.XLM | number : 3}}</td>
 					</tr>
 					<tr>
-						<td style="text-align: center; vertical-align: middle;">正常矿机数量</td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.alive | number : 0}}</td>
-						<td style="text-align: center; vertical-align: middle;">{{pools.ZCL.alive | number : 0}}</td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-					</tr>
-					<tr>
-						<td style="text-align: center; vertical-align: middle;">总算力</td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.hashrate | number : 2}} kH/s</td>
-						<td style="text-align: center; vertical-align: middle;">{{pools.ZCL.hashrate | number : 2}} kSol/s</td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-						<td style="text-align: center; vertical-align: middle;"></td>
-					</tr>
-					<tr>
 						<td style="text-align: center; vertical-align: middle;">显卡数</td>
 						<td style="text-align: center; vertical-align: middle;"></td>
 						<td style="text-align: center; vertical-align: middle;"></td>
@@ -103,6 +83,54 @@
 				</tbody>
 			</table>
 		</div>
+		
+		<div class="row">
+			<table cellspacing="2" cellpadding="2" class="table table-hover table-bordered">
+				<tbody id="Group">
+					<tr class="active">
+						<th style="text-align: center"></th>
+						<th style="text-align: center">矿池矿机数</th>
+						<th style="text-align: center">矿池算力</th>
+						<th style="text-align: center">显卡算力</th>
+						<th style="text-align: center">GTX 1063数量</th>
+						<th style="text-align: center">P106 数量</th>
+						<th style="text-align: center">显卡数</th>
+						<th style="text-align: center"></th>
+					</tr>
+					<tr>
+						<td style="text-align: center; vertical-align: middle;">ZEC</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.alive | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.hashrate | number : 2}} kSol/s</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.gpu_speed | number : 0}} Sol/s</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.gpu_1063 | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.gpu_p106 | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.gpu_num | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;"></td>
+					</tr>
+					<tr>
+						<td style="text-align: center; vertical-align: middle;">ZCL</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZCL.alive | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZCL.hashrate | number : 2}} kSol/s</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZCL.gpu_speed | number : 0}} Sol/s</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZCL.gpu_1063 | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZCL.gpu_p106 | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZCL.gpu_num | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;"></td>
+					</tr>
+					<tr>
+						<td style="text-align: center; vertical-align: middle;">总计</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.alive + pools.ZCL.alive | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.hashrate + pools.ZCL.hashrate | number : 2}} kSol/s</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.gpu_speed + pools.ZCL.gpu_speed | number : 0}} Sol/s</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.gpu_1063 + pools.ZCL.gpu_1063 | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.gpu_p106 + pools.ZCL.gpu_p106 | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;">{{pools.ZEC.gpu_num + pools.ZCL.gpu_num | number : 0}}</td>
+						<td style="text-align: center; vertical-align: middle;"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
 		<div class="row">
 			<table cellspacing="2" cellpadding="2" class="table table-hover table-bordered">
 				<tbody id="Group">
@@ -110,9 +138,10 @@
 						<th style="text-align: center">名称</th>
 						<th style="text-align: center">币种</th>
 						<th style="text-align: right">矿池算力</th>
-						<th style="text-align: right">显卡数</th>
+						<th style="text-align: right">显卡</th>
 						<th style="text-align: right">算力</th>
 						<th style="text-align: right">矿池/矿机A/R</th>
+						<th style="text-align: right">温度高/低</th>
 						<th style="text-align: center">运行时间</th>
 						<th style="text-align: center">备注</th>
 					</tr>
@@ -120,9 +149,10 @@
 						<td style="text-align: center">{{worker.name}}</td>
 						<td style="text-align: center">{{worker.coin}}</td>
 						<td style="text-align: right"><span ng-show="worker.hashrate">{{worker.hashrate | number : 2}} {{worker.rateunit}}</span></td>
-						<td style="text-align: right">{{worker.gpu_num | number : 0}}</td>
+						<td style="text-align: right">{{worker.gpu_desc}}</td>
 						<td style="text-align: right"><span ng-show="worker.gpu_speed">{{worker.gpu_speed | number : 0}} Sol/s</span></td>
 						<td style="text-align: right">{{worker.shares | number : 0}}<span ng-show="worker.gpu_accept">/{{worker.gpu_accept | number : 0}}/{{worker.gpu_reject | number : 0}}</span></td>
+						<td style="text-align: right"><span ng-show="worker.gpu_thigh">{{worker.gpu_thigh | number : 0}}/{{worker.gpu_tlow | number : 0}}</span></td>
 						<td style="text-align: center">{{worker.gpu_since  | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 						<td style="text-align: center">{{worker.gpu_update_desc}}</td>
 					</tr>
