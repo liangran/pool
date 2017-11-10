@@ -229,10 +229,10 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 					if ($scope.miners[name]) {
 						if (data[name].value.server == 'JG999:3333') {
 							$scope.miners[name].coin = 'ZEC';
-						} else if (data[name].value.server == 'JG999:6666'){
+						} else if (data[name].value.server == '127.0.0.1:8888'){
 							$scope.miners[name].coin = 'ZCL';
 						} else {
-							$scope.miners[name].coin = 'Unknown';
+							$scope.miners[name].coin = data[name].value.server;
 						}
 						$scope.miners[name].gpu_num = data[name].value.gpu_num;
 						$scope.miners[name].gpu_1063  = 0;
