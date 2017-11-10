@@ -21,6 +21,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 		workers.push('jg2' + str.substring(str.length - 2));
 	}
 	workers.push('jg999zec');
+	workers.push('jg999zec2');
 	
 	$scope.miners = {};
 	workers.forEach(function(name){
@@ -79,7 +80,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 				}
 			}
 			if (coin == 'ZEC' && worker.coin == coin && worker.state == 'on') {
-				if (name !== 'jg999zec') { 
+				if (name.indexOf('jg999zec') < 0) { 
 					$scope.pools[coin].alive++;
 				}
 				$scope.pools[coin].gpu_num   += (worker.gpu_num ? worker.gpu_num : 0);
@@ -175,7 +176,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 						if ($scope.miners[item.worker].state != 'on') {
 							$scope.miners[item.worker].coin = 'ZEC';
 						}
-						if (item.worker == 'jg999zec') {
+						if (['jg999zec', 'jg999zec2'].indexOf(item.worker) >= 0) {
 							$scope.miners[item.worker].state = 'on';
 						}
 						
@@ -227,7 +228,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 				var server_time = new Date(data.server_time);
 				for (var name in data) {
 					if ($scope.miners[name]) {
-						if (data[name].value.server == 'JG999:3333') {
+						if (['JG999:3333', 'JG999:3334'].indexOf(data[name].value.server) >= 0) {
 							$scope.miners[name].coin = 'ZEC';
 						} else if (data[name].value.server == '127.0.0.1:8888'){
 							$scope.miners[name].coin = 'ZCL';

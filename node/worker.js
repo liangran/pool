@@ -92,6 +92,7 @@ function beginMining(callback) {
 }
 
 function check(callback) {
+	var last_rejected = state.rejected_shares;
 	state.refresh((err) => {
 		if (err) {
 			return callback(err);
@@ -102,7 +103,7 @@ function check(callback) {
 			return callback('timeout');
 		}
 		
-		if (state.rejected_shares > 10) {
+		if (state.rejected_shares > 10 || state.rejected_shares - last_rejected > 2) {
 			logger.warn('Too much rejected');
 			return callback('reject too much');
 		}
