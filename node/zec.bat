@@ -1,1 +1,1 @@
-START C:\Zec\0.3.4b\zec999.bat
+START C:\Zec\0.3.4b\zec9999.bat
