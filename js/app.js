@@ -20,8 +20,8 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 		var str = '0' + i;
 		workers.push('jg2' + str.substring(str.length - 2));
 	}
+	workers.push('jg999');
 	workers.push('jg999zec');
-	workers.push('jg999zec2');
 	
 	$scope.miners = {};
 	workers.forEach(function(name){
@@ -176,7 +176,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 						if ($scope.miners[item.worker].state != 'on') {
 							$scope.miners[item.worker].coin = 'ZEC';
 						}
-						if (['jg999zec', 'jg999zec2'].indexOf(item.worker) >= 0) {
+						if (['jg999zec'].indexOf(item.worker) >= 0) {
 							$scope.miners[item.worker].state = 'on';
 						}
 						
