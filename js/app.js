@@ -228,7 +228,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 				var server_time = new Date(data.server_time);
 				for (var name in data) {
 					if ($scope.miners[name]) {
-						if (['JG999:3333', 'JG999:3334'].indexOf(data[name].value.server) >= 0) {
+						if (['JG999:3333', 'JG999:3334', '127.0.0.1:9999'].indexOf(data[name].value.server) >= 0) {
 							$scope.miners[name].coin = 'ZEC';
 						} else if (data[name].value.server == '127.0.0.1:8888'){
 							$scope.miners[name].coin = 'ZCL';
