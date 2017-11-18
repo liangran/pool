@@ -91,8 +91,10 @@ function beginMining(callback) {
 	});
 }
 
+var shares_nochange_count = 0;
 function check(callback) {
 	var last_rejected = state.rejected_shares;
+	var last_shares = state.accepted_shares;
 	state.refresh((err) => {
 		if (err) {
 			return callback(err);
@@ -107,6 +109,17 @@ function check(callback) {
 			logger.warn('Too much rejected');
 			return callback('reject too much');
 		}
+		
+		if (state.accepted_shares == last_shares) {
+			shares_nochange_count++;
+			logger.warn('shares_nochange_count: ' + shares_nochange_count);
+			if (shares_nochange_count > 2) {
+				return callback('no output');
+			}
+		} else {
+			shares_nochange_count = 0;
+		}
+		
 		return callback(null);
 	});
 }
