@@ -9,16 +9,20 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 	var zec_api = "https://api-zcash.flypool.org/miner/t1NajHvjBQtndnn1VEzY5r4xgYihZ8e5bE2/workers?miner=t1NajHvjBQtndnn1VEzY5r4xgYihZ8e5bE2";
 	var gpu_api = "http://120.26.101.219:90";
 	
-	var price_api = "https://api.coinmarketcap.com/v1/ticker/?convert=CNY&limit=400";
+	var price_api = "https://api.coinmarketcap.com/v1/ticker/?convert=CNY&limit=500";
 	
 	var workers = ['jg001', 'jg002', 'jg003'];
 	for (var i=1; i<=23; i++) {
 		var str = '0' + i;
 		workers.push('jg1' + str.substring(str.length - 2));
 	}
-	for (var i=1; i<=28; i++) {
+	for (var i=1; i<=27; i++) {
 		var str = '0' + i;
 		workers.push('jg2' + str.substring(str.length - 2));
+	}
+	for (var i=1; i<=6; i++) {
+		var str = '0' + i;
+		workers.push('jg3' + str.substring(str.length - 2));
 	}
 	workers.push('jg999');
 	workers.push('jg999zec');
