@@ -36,7 +36,9 @@ if (myArgs[0] == 'zec') {
 	task.start  = __dirname + '\\zcl.bat';
 }
 
-var state = new State(getWorkerName());
+var workername = getWorkerName();
+logger.warn('Worker Name: ' + workername);
+var state = new State(workername);
 
 function run(command, params, callback) {
 	logger.warn('Spawn', command, params.join(' '));
