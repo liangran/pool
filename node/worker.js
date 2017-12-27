@@ -116,6 +116,7 @@ function check(callback) {
 			shares_nochange_count++;
 			logger.warn('shares_nochange_count: ' + shares_nochange_count);
 			if (shares_nochange_count > 2) {
+				shares_nochange_count = 0;
 				return callback('no output');
 			}
 		} else {
