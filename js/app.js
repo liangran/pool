@@ -211,7 +211,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 		$scope.price.refreshing = true;
 		getResource(price_api, function(err, data) {
 			$scope.price.refreshing = false;
-			var coins_price = ['BTC', 'BCH', 'ETH', 'ZEC', 'ZCL', 'XRP', 'XLM', 'SC']
+			var coins_price = ['BTC', 'BCH', 'ETH', 'ZEC', 'ZCL', 'XRP', 'XLM', 'SC', 'DCR', 'LTC', 'DOGE']
 			if (data) {
 				data.forEach(function(item){
 					if (coins_price.indexOf(item.symbol) >=0) {
