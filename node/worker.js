@@ -26,14 +26,17 @@ process.on('exit', function () {
 var task = {
 	exe     : 'miner.exe',
 	start   : undefined,
-	thread  : undefined
+	thread  : undefined,
+	reset_c : 0
 };
 
 var myArgs = process.argv.slice(2);
 if (myArgs[0] == 'zec') {
 	task.start  = __dirname + '\\zec.bat';
+	task.reset_c = 5;
 } else {
 	task.start  = __dirname + '\\zcl.bat';
+	task.reset_c = 2;
 }
 
 var workername = getWorkerName();
@@ -115,7 +118,7 @@ function check(callback) {
 		if (state.accepted_shares == last_shares) {
 			shares_nochange_count++;
 			logger.warn('shares_nochange_count: ' + shares_nochange_count);
-			if (shares_nochange_count > 2) {
+			if (shares_nochange_count > task.reset_c) {
 				shares_nochange_count = 0;
 				return callback('no output');
 			}
