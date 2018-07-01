@@ -33,10 +33,10 @@ var task = {
 var myArgs = process.argv.slice(2);
 if (myArgs[0] == 'zec') {
 	task.start  = __dirname + '\\zec.bat';
-	task.reset_c = 5;
+	task.reset_c = 6;
 } else {
 	task.start  = __dirname + '\\zcl.bat';
-	task.reset_c = 2;
+	task.reset_c = 4;
 }
 
 var workername = getWorkerName();
