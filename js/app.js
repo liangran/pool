@@ -11,21 +11,12 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 	
 	var price_api = "https://api.coinmarketcap.com/v1/ticker/?convert=CNY&limit=500";
 	
-	var workers = ['jg001', 'jg002', 'jg003'];
-	for (var i=1; i<=23; i++) {
-		var str = '0' + i;
-		workers.push('jg1' + str.substring(str.length - 2));
+	var workers = ['a001', 'a002', 'a003', 'a004'];
+	for (var i=1; i<=24; i++) {
+		var str = '00' + i;
+		workers.push('JG' + str.substring(str.length - 3));
 	}
-	for (var i=1; i<=27; i++) {
-		var str = '0' + i;
-		workers.push('jg2' + str.substring(str.length - 2));
-	}
-	for (var i=1; i<=6; i++) {
-		var str = '0' + i;
-		workers.push('jg3' + str.substring(str.length - 2));
-	}
-	workers.push('jg999');
-	workers.push('jg999zec');
+	
 	
 	$scope.miners = {};
 	workers.forEach(function(name){
@@ -129,9 +120,12 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 				for (var key in data.workers) {
 					var item = data.workers[key];
 					var name = key.split('.')[1];
+					console.log(key, item);
 					if (!$scope.miners[name]) {
 						item.worker = 'ZCL_' + name;
 						$scope.miners[name] = {name : name, coin : 'ZCL'};
+					} else {
+						$scope.miners[name].coin = 'ZCL';
 					}
 					
 					//$scope.miners[name].coin = 'ZCL';
@@ -155,7 +149,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 //						}
 					}
 				}
-				$scope.after('ZCL');
+				//$scope.after('ZCL');
 			}
 		});
 	}
@@ -201,9 +195,9 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 	
 	$scope.refresh = function(callback) {
 		$scope.refreshZCL();
-		$scope.refreshZEC();
+		//$scope.refreshZEC();
 		$scope.refreshPrice();
-		$scope.refreshGpu();
+		//$scope.refreshGpu();
 	}
 	
 	$scope.price = {refreshing: false};
@@ -211,7 +205,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 		$scope.price.refreshing = true;
 		getResource(price_api, function(err, data) {
 			$scope.price.refreshing = false;
-			var coins_price = ['BTC', 'BCH', 'ETH', 'ZEC', 'ZCL', 'XRP', 'XLM', 'SC', 'DCR', 'LTC', 'DOGE']
+			var coins_price = ['BTC', 'BCH', 'ETH', 'ZEC', 'ZCL', 'XRP', 'XLM', 'SC', 'DCR', 'LTC', 'DOGE', 'MONA', 'VTC']
 			if (data) {
 				data.forEach(function(item){
 					if (coins_price.indexOf(item.symbol) >=0) {
