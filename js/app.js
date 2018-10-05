@@ -117,6 +117,11 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 			if (err) {
 				console.error(err);
 			} else {
+				for (var name in $scope.miners) {
+					if ($scope.miners[name].coin == 'ZCL') {
+						$scope.miners[name].state    = 'off';
+					}
+				}
 				for (var key in data.workers) {
 					var item = data.workers[key];
 					var name = key.split('.')[1];
@@ -134,6 +139,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 						$scope.miners[name].rateunit = item.hashrateString.split(' ')[1];
 						$scope.miners[name].shares   = item.shares;
 						$scope.miners[name].time     = refresh_time;
+						$scope.miners[name].state    = 'on';
 						
 //						var hist = data.history[key];
 //						$scope.miners[name].lasttime = new Date(hist[hist.length-1].time * 1000);
@@ -149,7 +155,7 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 //						}
 					}
 				}
-				//$scope.after('ZCL');
+				$scope.after('ZCL');
 			}
 		});
 	}
