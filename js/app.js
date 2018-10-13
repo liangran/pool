@@ -11,7 +11,11 @@ myApp.controller('MyController', function($scope, $interval, $http) {
 	
 	var price_api = "https://api.coinmarketcap.com/v1/ticker/?convert=CNY&limit=500";
 	
-	var workers = ['a001', 'a002', 'a003', 'a004'];
+	var workers = [];
+	for (var i=1; i<=10; i++) {
+		var str = '00' + i;
+		workers.push('a' + str.substring(str.length - 3));
+	}
 	for (var i=1; i<=24; i++) {
 		var str = '00' + i;
 		workers.push('JG' + str.substring(str.length - 3));
